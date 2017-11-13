@@ -4,6 +4,7 @@ import math
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
+EXP_MAX = 709
 
 def softmax(x):
     """
@@ -17,9 +18,8 @@ def softmax(x):
     # With a vectorized implementation, the code should be no more than 2 lines.
     #
     # For numeric stability, use the identify you proved in Ex 2 Q1.
-    x = np.array([math.exp(a) for a in x])
-    x /= np.sum(x)
-    return x
+    exps = np.exp(x - np.max(x))
+    return exps / np.sum(exps)
 
 
 def classifier_output(x, params):
