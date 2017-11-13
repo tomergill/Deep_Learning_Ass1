@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
@@ -16,6 +17,8 @@ def softmax(x):
     # With a vectorized implementation, the code should be no more than 2 lines.
     #
     # For numeric stability, use the identify you proved in Ex 2 Q1.
+    x = np.array([math.exp(a) for a in x])
+    x /= np.sum(x)
     return x
 
 
