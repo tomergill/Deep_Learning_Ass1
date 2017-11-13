@@ -54,10 +54,10 @@ def loss_and_gradients(x, y, params):
     W, b = params
     # YOU CODE HERE
     probs = classifier_output(x, [W, b])
-    Y = np.zeros(np.size(x))
-    Y[y] = 1
-    loss = -1 * np.sum(Y * np.log(probs))
-
+    loss = -1 * math.log(probs[y])
+    gb = probs.copy()
+    gb[y] -= 1
+    gW = np.array([[x[i] * gb[j] for j in range(W.shape[1])] for i in range(W.shape[0])])
     return loss, [gW, gb]
 
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         return loss, grads[1]
 
 
-    for _ in xrange(10):
+    for _ in xrange(1000):
         W = np.random.randn(W.shape[0], W.shape[1])
         b = np.random.randn(b.shape[0])
         gradient_check(_loss_and_b_grad, b)
