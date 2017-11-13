@@ -4,8 +4,6 @@ import math
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
-EXP_MAX = 709
-
 def softmax(x):
     """
     Compute the softmax vector.
@@ -29,6 +27,7 @@ def classifier_output(x, params):
     """
     W, b = params
     # YOUR CODE HERE.
+    probs = softmax(np.dot(x, W) + b)
     return probs
 
 
@@ -54,6 +53,11 @@ def loss_and_gradients(x, y, params):
     """
     W, b = params
     # YOU CODE HERE
+    probs = classifier_output(x, [W, b])
+    Y = np.zeros(np.size(x))
+    Y[y] = 1
+    loss = -1 * np.sum(Y * np.log(probs))
+
     return loss, [gW, gb]
 
 
