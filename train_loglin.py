@@ -11,7 +11,7 @@ def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
     size = len(features)
-    return np.array([features.count(bigram) / size for bigram, i in ut.F2I.iteritems()])
+    return np.array([(100 * features.count(bigram) / size) for bigram, i in ut.F2I.iteritems()])
 
 
 def accuracy_on_dataset(dataset, params):
@@ -47,13 +47,13 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         for label, features in train_data:
             x = feats_to_vec(features)  # convert features to a vector.
             y = ut.L2I[label]           # convert the label to number if needed.
-            loss, grads = ll.loss_and_gradients(x,y,params)
+            loss, grads = ll.loss_and_gradients(x, y, params)
             cum_loss += loss
             # YOUR CODE HERE
             # update the parameters according to the gradients
             # and the learning rate.
-            for i in enumerate(grads):
-                params[i] -= learning_rate * grads[i]
+            for i, g in enumerate(grads):
+                params[i] -= learning_rate * g
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -68,11 +68,11 @@ if __name__ == '__main__':
     # and call train_classifier.
     train_data = ut.TRAIN
     dev_data = ut.DEV
-    num_iterations = 30
-    learning_rate = 0.1
+    num_iterations = 10
+    learning_rate = 0.2
     in_dim = len(ut.F2I)
     out_dim = len(ut.L2I)
 
+
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
-
