@@ -4,6 +4,7 @@ import math
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
+
 def softmax(x):
     """
     Compute the softmax vector.
