@@ -1,7 +1,7 @@
 import numpy as np
 
-STUDENT={'name': 'YOUR NAME',
-         'ID': 'YOUR ID NUMBER'}
+STUDENT = {'name': 'Tomer Gill',
+           'ID': '318459450'}
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
@@ -20,6 +20,7 @@ def create_classifier(in_dim, hid_dim, out_dim):
     with input dimension in_dim, hidden dimension hid_dim,
     and output dimension out_dim.
     """
+
     params = []
     return params
 

@@ -6,7 +6,7 @@ import random
 def read_data(fname):
     data = []
     for line in file(fname):
-        label, text = line.strip().lower().split("\t",1)
+        label, text = line.strip().lower().split("\t", 1)
         data.append((label, text))
     return data
 
@@ -19,6 +19,7 @@ TRAIN = [(l, text_to_bigrams(t)) for l, t in read_data("train")]
 DEV = [(l, text_to_bigrams(t)) for l, t in read_data("dev")]
 
 from collections import Counter
+
 fc = Counter()
 for l, feats in TRAIN:
     fc.update(feats)
@@ -31,8 +32,20 @@ L2I = {l: i for i, l in enumerate(list(sorted(set([l for l, t in TRAIN]))))}
 # feature strings (bigrams) to IDs
 F2I = {f: i for i, f in enumerate(list(sorted(vocab)))}
 
+
+########################
+
+
+def getTEST():
+    if getTEST.TEST is None:
+        getTEST.TEST = [text_to_bigrams(txt) for label, txt in read_data("test")]
+    return getTEST.TEST
+
+
+getTEST.TEST = None
+
 if __name__ == "__main__":
-    print 'DEV'
-    for lang, fs in DEV:
-        print lang + ':'
-        print fs
+    print 'TEST'
+    for f in getTEST():
+        print f
+#######################

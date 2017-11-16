@@ -6,6 +6,8 @@ import numpy as np
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
+predictTest = True  # set wether the log-liniear should predict the test data and write it to the file
+
 
 def feats_to_vec(features):
     # YOUR CODE HERE.
@@ -46,7 +48,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         random.shuffle(train_data)
         for label, features in train_data:
             x = feats_to_vec(features)  # convert features to a vector.
-            y = ut.L2I[label]           # convert the label to number if needed.
+            y = ut.L2I[label]  # convert the label to number if needed.
             loss, grads = ll.loss_and_gradients(x, y, params)
             cum_loss += loss
             # YOUR CODE HERE
@@ -68,11 +70,20 @@ if __name__ == '__main__':
     # and call train_classifier.
     train_data = ut.TRAIN
     dev_data = ut.DEV
-    num_iterations = 10
-    learning_rate = 0.2
+    num_iterations = 50
+    learning_rate = 0.01
     in_dim = len(ut.F2I)
     out_dim = len(ut.L2I)
 
-
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
+
+    if predictTest:
+        I2L = {i: l for l, i in ut.L2I.iteritems()}
+        print I2L
+        test = open("test.pred", "w")
+        for feature in ut.getTEST():
+            lang = ll.predict(feats_to_vec(feature), trained_params)
+            test.write(I2L[lang] + '\n')
+            print I2L[lang]
+        test.close()

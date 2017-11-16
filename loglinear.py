@@ -58,7 +58,8 @@ def loss_and_gradients(x, y, params):
     loss = -1 * math.log(probs[y])
     gb = probs.copy()
     gb[y] -= 1
-    gW = np.array([[x[i] * gb[j] for j in range(W.shape[1])] for i in range(W.shape[0])])
+    # gW = np.array([[x[i] * gb[j] for j in range(W.shape[1])] for i in range(W.shape[0])])
+    gW = np.outer(x, gb)
     return loss, [gW, gb]
 
 
