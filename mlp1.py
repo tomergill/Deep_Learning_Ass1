@@ -3,8 +3,11 @@ import math
 
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
+
+
 def tanh(x):
     return np.divide(np.exp(x) + 1, np.expm1(x))
+
 
 def softmax(x):
     """
@@ -15,14 +18,17 @@ def softmax(x):
     exps = np.exp(x - np.max(x))
     return exps / np.sum(exps)
 
+
 def classifier_output(x, params):
     W1, b1, W2, b2 = params
     h1 = tanh(x.dot(W1) + b1)
     probs = softmax(h1.dot(W2) + b2)
     return probs
 
+
 def predict(x, params):
     return np.argmax(classifier_output(x, params))
+
 
 def loss_and_gradients(x, y, params):
     # YOU CODE HERE
@@ -36,7 +42,7 @@ def loss_and_gradients(x, y, params):
     def gtag(v):
         return 1 - tanh(v) ** 2
 
-    #gWs
+    # gWs
     a = [x]
     a.append(tanh(a[0].dot(W1)))
     a.append(tanh(a[1].dot(W2)))
@@ -46,7 +52,15 @@ def loss_and_gradients(x, y, params):
 
     delta = [a_i.dot(lower_delta[i]) for i, a_i in enumerate(a[1:])]
 
-    return [loss, gb, delta]
+    return [loss, [gb, delta]
+
+
+def uniform_init(dim1, dim2=0):
+    epsilon = math.sqrt(6) / math.sqrt(dim1 + dim2)
+    if dim2 == 0:
+        return np.random.uniform(-1 * epsilon, epsilon, dim1)
+    return np.random.uniform(-1 * epsilon, epsilon, [dim1, dim2]) #else
+
 
 def create_classifier(in_dim, hid_dim, out_dim):
     """
@@ -54,10 +68,9 @@ def create_classifier(in_dim, hid_dim, out_dim):
     with input dimension in_dim, hidden dimension hid_dim,
     and output dimension out_dim.
     """
-    W1 = np.random.rand(in_dim, hid_dim)
-    b1 = np.random.rand(hid_dim)
-    W2 = np.random.rand(hid_dim, out_dim)
-    b2 = np.random.rand(out_dim)
-    params = [W1,b1,W2,b2]
+    W1 = uniform_init(in_dim, hid_dim)
+    b1 = uniform_init(hid_dim)
+    W2 = uniform_init(hid_dim, out_dim)
+    b2 = uniform_init(out_dim)
+    params = [W1, b1, W2, b2]
     return params
-

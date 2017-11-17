@@ -1,4 +1,4 @@
-import loglinear as ll
+import mlp1 as m1
 import random
 import utils as ut
 import numpy as np
@@ -17,13 +17,9 @@ def feats_to_vec(features):
 def accuracy_on_dataset(dataset, params):
     good = bad = 0.0
     for label, features in dataset:
-        # YOUR CODE HERE
-        # Compute the accuracy (a scalar) of the current parameters
-        # on the dataset.
-        # accuracy is (correct_predictions / all_predictions)
         x = feats_to_vec(features)  # convert features to a vector.
-        y = ut.L2I[label]  # convert the label to number if needed.
-        if ll.predict(x, params) == y:
+        y = ut.L2I[label]           # convert the label to number
+        if m1.predict(x, params) == y:
             good += 1
         else:
             bad += 1
@@ -47,7 +43,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         for label, features in train_data:
             x = feats_to_vec(features)  # convert features to a vector.
             y = ut.L2I[label]  # convert the label to number if needed.
-            loss, grads = ll.loss_and_gradients(x, y, params)
+            loss, grads = m1.loss_and_gradients(x, y, params)
             cum_loss += loss
             # YOUR CODE HERE
             # update the parameters according to the gradients
@@ -72,18 +68,19 @@ if __name__ == '__main__':
     learning_rate = 0.01
     in_dim = len(ut.F2I)
     out_dim = len(ut.L2I)
+    hidden_dim = 10
 
-    params = ll.create_classifier(in_dim, out_dim)
+    params = m1.create_classifier(in_dim, hidden_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
 
-    predictTest = True  # set whether the log-linear should predict the test data and write it to the file
+    predictTest = False  # set wether the log-liniear should predict the test data and write it to the file
 
     if predictTest:
         I2L = {i: l for l, i in ut.L2I.iteritems()}
         print I2L
         test = open("test.pred", "w")
         for feature in ut.getTEST():
-            lang = ll.predict(feats_to_vec(feature), trained_params)
+            lang = m1.predict(feats_to_vec(feature), trained_params)
             test.write(I2L[lang] + '\n')
             print I2L[lang]
         test.close()
