@@ -92,23 +92,23 @@ if __name__ == '__main__':
     # If they pass, it is likely, but not certainly, correct.
     from grad_check import gradient_check
 
-    W, b = create_classifier(3, 4)
+    W1, b1 = create_classifier(3, 4)
 
 
     def _loss_and_W_grad(W):
-        global b
+        global b1
         loss, grads = loss_and_gradients([1, 2, 3], 0, [W, b])
         return loss, grads[0]
 
 
     def _loss_and_b_grad(b):
-        global W
+        global W1
         loss, grads = loss_and_gradients([1, 2, 3], 0, [W, b])
         return loss, grads[1]
 
 
     for _ in xrange(1000):
-        W = np.random.randn(W.shape[0], W.shape[1])
-        b = np.random.randn(b.shape[0])
-        gradient_check(_loss_and_b_grad, b)
-        gradient_check(_loss_and_W_grad, W)
+        W1 = np.random.randn(W1.shape[0], W1.shape[1])
+        b1 = np.random.randn(b1.shape[0])
+        gradient_check(_loss_and_b_grad, b1)
+        gradient_check(_loss_and_W_grad, W1)
