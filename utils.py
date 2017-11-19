@@ -44,6 +44,28 @@ def getTEST():
 
 getTEST.TEST = None
 
+
+def get_unigrams():
+    if get_unigrams.list is None:
+
+        TRAIN_UNI = [(l, list(t)) for l, t in read_data("train")]
+        TEST_UNI = [(l, list(t)) for l, t in read_data("dev")]
+
+        myfc = Counter()
+        for l, feats in TRAIN_UNI:
+            myfc.update(feats)
+
+        # 600 most common bigrams in the training set.
+        vocab_uni = set([x for x, c in myfc.most_common(600)])
+        # feature strings (bigrams) to IDs
+        F2I_UNI = {f: i for i, f in enumerate(list(sorted(vocab_uni)))}
+
+        get_unigrams.list = [TRAIN_UNI, TEST_UNI, F2I_UNI]
+    return get_unigrams.list
+
+
+get_unigrams.list = None
+
 if __name__ == "__main__":
     print 'TEST'
     for f in getTEST():

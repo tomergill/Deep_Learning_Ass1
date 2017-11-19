@@ -37,8 +37,9 @@ def loss_and_gradients(x, y, params):
     probs = classifier_output(x, params)
     loss = -1 * math.log(probs[y])
 
-    def gtag(v):
-        return 1 - np.tanh(v) ** 2
+    # for optimization was not declared
+    # def gtag(v):
+    #     return 1 - np.tanh(v) ** 2
 
     """
     yvector = np.zeros_like(x)
@@ -69,7 +70,7 @@ def loss_and_gradients(x, y, params):
     gW2[:, y] -= h
 
     # gradients of W1 & b1
-    dtanh_db1 = gtag(x.dot(W1) + b1)
+    dtanh_db1 = 1 - np.square(h)  # gtag(x.dot(W1) + b1)
     dl_dtanh = W2.dot(probs) - W2[:, y]
 
     # gb1
