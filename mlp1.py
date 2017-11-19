@@ -5,8 +5,8 @@ STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
 
-def tanh(x):
-    return np.divide(np.expm1(x), np.exp(x) + 1)
+# def tanh(x):
+#     return np.divide(np.expm1(x), np.exp(x) + 1)
 
 
 def softmax(x):
@@ -21,7 +21,7 @@ def softmax(x):
 
 def classifier_output(x, params):
     W1, b1, W2, b2 = params
-    h1 = tanh(x.dot(W1) + b1)
+    h1 = np.tanh(x.dot(W1) + b1)
     probs = softmax(h1.dot(W2) + b2)
     return probs
 
@@ -38,7 +38,7 @@ def loss_and_gradients(x, y, params):
     loss = -1 * math.log(probs[y])
 
     def gtag(v):
-        return 1 - tanh(v) ** 2
+        return 1 - np.tanh(v) ** 2
 
     """
     yvector = np.zeros_like(x)
@@ -64,13 +64,13 @@ def loss_and_gradients(x, y, params):
     gb2[y] -= 1
 
     # gW2
-    h = tanh(x.dot(W1) + b1)
+    h = np.tanh(x.dot(W1) + b1)
     gW2 = np.outer(h, probs)
     gW2[:, y] -= h
 
     # gradients of W1 & b1
     dtanh_db1 = gtag(x.dot(W1) + b1)
-    dl_dtanh = W1.dot(probs) - W2[:, y]
+    dl_dtanh = W2.dot(probs) - W2[:, y]
 
     # gb1
     gb1 = dl_dtanh * dtanh_db1
@@ -110,25 +110,25 @@ if __name__ == '__main__':
     W1, b1, W2, b2 = create_classifier(3, 7, 9)
 
 
-    def _loss_and_W2_grad(U):
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [U, W1, b1, b2])
-        return loss, grads[0]
-
-
-    def _loss_and_W1_grad(W):
-        global b1
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [W2, W, b1, b2])
-        return loss, grads[1]
-
-
-    def _loss_and_b1_grad(b):
-        global W1
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [W2, W1, b, b2])
+    def _loss_and_W2_grad(W2):
+        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W1, b1, W2, b2])
         return loss, grads[2]
 
 
-    def _loss_and_b2_grad(b_tag):
-        loss, grads = loss_and_gradients([1, 2, 3], 0, [W2, W1, b1, b_tag])
+    def _loss_and_W1_grad(W1):
+        global b1
+        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W1, b1, W2, b2])
+        return loss, grads[0]
+
+
+    def _loss_and_b1_grad(b1):
+        global W1
+        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W1, b1, W2, b2])
+        return loss, grads[1]
+
+
+    def _loss_and_b2_grad(b2):
+        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W1, b1, W2, b2])
         return loss, grads[3]
 
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         b1 = np.random.randn(b1.shape[0])
         W2 = np.random.randn(W2.shape[0], W2.shape[1])
         b2 = np.random.randn(b2.shape[0])
-        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W2, W1, b1, b2])
+        loss, grads = loss_and_gradients(np.array([1, 2, 3]), 0, [W1, b1, W2, b2])
 
         gradient_check(_loss_and_W2_grad, W2)
         gradient_check(_loss_and_W1_grad, W1)
