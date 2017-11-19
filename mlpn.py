@@ -4,8 +4,6 @@ import math
 STUDENT = {'name': 'Tomer Gill',
            'ID': '318459450'}
 
-def tanh(x):
-    return np.divide(np.exp(x) + 1, np.expm1(x))
 
 def softmax(x):
     """
@@ -16,26 +14,61 @@ def softmax(x):
     exps = np.exp(x - np.max(x))
     return exps / np.sum(exps)
 
+
 def classifier_output(x, params):
-    W, b = params[0], params[1]
+    W, b = params[0]
     h = x.dot(W) + b
-    for W, b in zip(params[2:], params[3:]):
-        h = tanh(h).dot(W) + b
-    probs = softmax(h)
+    probs = list()
+    for (W, b) in params[1:]:
+        probs.append(np.tanh(h))
+        h = probs[-1].dot(W) + b
+    probs.append(softmax(h))
     return probs
 
+
 def predict(x, params):
-    return np.argmax(classifier_output(x, params))
+    return np.argmax(classifier_output[-1](x, params))
+
 
 def loss_and_gradients(x, y, params):
-    # YOU CODE HERE
-    return ...
+    all_probs = classifier_output(x, params)  # layers 1 to n and softmax of n
+    probs = all_probs[-1]
+    layer_probs = all_probs[:-2]
+    loss = -1 * math.log(probs[y])
+
+    W_n, b_n = params[-1]
+
+    dl_dtanh = W_n.dot(probs) - W_n[:, y]
+
+    gb_n = probs.copy()
+    gb_n[y] -= 1
+
+    gW_n = np.outer(layer_probs[-1], probs)
+    temp = np.zeros_like(gW_n)
+    temp[:, y] = layer_probs[-1]
+    gW_n -= temp
+
+    gradients = [(gW_n, gb_n)]
+
+    layer = len(params) - 2
+    r_params = reversed(params)
+    for W, b in r_params[1:]:  # [(W1,b1),...,(W_n-1,b_n-1)]
+        gb = 1 - np.square(layer_probs[layer].dot(W) + b)
+        gW = layer_probs[layer].dot(gb)
+
+        gradients.append((gW * dl_dtanh, gb * dl_dtanh))
+
+        dl_dtanh = (gb * W).dot(dl_dtanh)
+        layer -= 1
+
+    return loss, gradients.reverse()
 
 def uniform_init(dim1, dim2=0):
     epsilon = math.sqrt(6) / math.sqrt(dim1 + dim2)
     if dim2 == 0:
         return np.random.uniform(-1 * epsilon, epsilon, dim1)
-    return np.random.uniform(-1 * epsilon, epsilon, [dim1, dim2]) #else
+    return np.random.uniform(-1 * epsilon, epsilon, [dim1, dim2])  # else
+
 
 def create_classifier(dims):
     """
@@ -59,7 +92,5 @@ def create_classifier(dims):
     """
     params = []
     for dim1, dim2 in zip(dims, dims[1:]):
-        params.append(uniform_init(dim1,dim2))
-        params.append(uniform_init(dim2))
+        params.append((uniform_init(dim1, dim2), uniform_init(dim2)))
     return params
-
