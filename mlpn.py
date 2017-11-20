@@ -16,10 +16,10 @@ def softmax(x):
 
 
 def classifier_output(x, params):
-    W, b = params[0]
+    W, b = params[0], params[1]
     h = x.dot(W) + b
-    probs = list()
-    for (W, b) in params[1:]:
+    probs = [x]
+    for W, b in zip(params[2::2], params[3::2]):
         probs.append(np.tanh(h))
         h = probs[-1].dot(W) + b
     probs.append(softmax(h))
@@ -31,11 +31,12 @@ def predict(x, params):
 
 
 def loss_and_gradients(x, y, params):
-    all_probs = classifier_output(x, params)  # layers 1 to n and softmax of n
+    all_probs = classifier_output(x, params)  # layers 0 (x) to n and softmax of n
     probs = all_probs[-1]
-    layer_probs = all_probs[:-2]
+    layer_probs = all_probs[:-1]
     loss = -1 * math.log(probs[y])
 
+    params = [(W, b) for W, b in zip(params[::2], params[1::2])]  # params is now in pairs
     W_n, b_n = params[-1]
 
     dl_dtanh = W_n.dot(probs) - W_n[:, y]
@@ -48,14 +49,15 @@ def loss_and_gradients(x, y, params):
     temp[:, y] = layer_probs[-1]
     gW_n -= temp
 
-    gradients = [(gW_n, gb_n)]
+    gradients = [gb_n, gW_n]
 
-    layer = len(params) - 2
-    for W, b in (params[:-1:-1]):  # [(W1,b1),...,(W_n-1,b_n-1)]
-        gb = 1 - np.square(layer_probs[layer].dot(W) + b)
-        gW = layer_probs[layer].dot(gb)
+    layer = len(params) - 2  # n - 2
+    for W, b in params[-2::-1]:  # [(W_n-1,b_n-1),...,(W1,b1)]
+        gb = 1 - np.square(np.tanh(layer_probs[layer].dot(W) + b))
+        gW = layer_probs[layer].reshape(len(layer_probs[layer]), 1).dot(gb.reshape(1, len(gb)))
 
-        gradients.append((gW * dl_dtanh, gb * dl_dtanh))
+        gradients.append(gb * dl_dtanh)
+        gradients.append(gW * dl_dtanh)
 
         dl_dtanh = (gb * W).dot(dl_dtanh)
         layer -= 1
@@ -93,7 +95,8 @@ def create_classifier(dims):
     """
     params = []
     for dim1, dim2 in zip(dims, dims[1:]):
-        params.append((uniform_init(dim1, dim2), uniform_init(dim2)))
+        params.append(uniform_init(dim1, dim2))
+        params.append(uniform_init(dim2))
     return params
 
 
@@ -113,21 +116,15 @@ if __name__ == '__main__':
         params_to_send = np.copy(params)
         par_num = 0
         for i in range(len(params)):
-            if p.shape == params[i][0].shape:
-                params_to_send[i][0] = p
-                par_num = i, 0
-            elif p.shape == params[i][1].shape:
-                params_to_send[i][1] = p
-                par_num = i, 1
+            if p.shape == params[i].shape:
+                params_to_send[i] = p
+                par_num = i
 
         loss, grads = loss_and_gradients(np.array(range(dims[0])), 0, params_to_send)
-        return loss, grads[par_num[0]][par_num[1]]
+        return loss, grads[par_num]
 
 
-    for _ in range(10):
+    for _ in xrange(10):
         my_params = create_classifier(dims)
-        for i, p in enumerate(my_params):
-            print "gcheck - W_" + str(i) + ":"
-            gradient_check(_loss_and_p_grad, p[0])
-            print "gcheck - b_" + str(i) + ":"
-            gradient_check(_loss_and_p_grad, p[1])
+        for p in my_params:
+            gradient_check(_loss_and_p_grad, p)
