@@ -1,3 +1,3 @@
 1. YES, loglin:84% MLP1:86%
 2. loglin:64% MLP1:60%
-3. 17 iterations
+3. about 17 iterations in average

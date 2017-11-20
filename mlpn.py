@@ -27,7 +27,7 @@ def classifier_output(x, params):
 
 
 def predict(x, params):
-    return np.argmax(classifier_output[-1](x, params))
+    return np.argmax(classifier_output(x, params)[-1])
 
 
 def loss_and_gradients(x, y, params):

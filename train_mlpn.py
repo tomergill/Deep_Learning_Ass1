@@ -1,4 +1,4 @@
-import mlp1 as m1
+import mlpn as mn
 import random
 import utils as ut
 import numpy as np
@@ -19,7 +19,7 @@ def accuracy_on_dataset(dataset, params, F2I):
     for label, features in dataset:
         x = feats_to_vec(features, F2I)  # convert features to a vector.
         y = ut.L2I[label]           # convert the label to number
-        if m1.predict(x, params) == y:
+        if mn.predict(x, params) == y:
             good += 1
         else:
             bad += 1
@@ -43,7 +43,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
         for label, features in train_data:
             x = feats_to_vec(features, F2I)  # convert features to a vector.
             y = ut.L2I[label]  # convert the label to number if needed.
-            loss, grads = m1.loss_and_gradients(x, y, params)
+            loss, grads = mn.loss_and_gradients(x, y, params)
             cum_loss += loss
             # YOUR CODE HERE
             # update the parameters according to the gradients
@@ -59,38 +59,29 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
 
 
 if __name__ == '__main__':
-    test_bigrams = True
+    predictTest = True
 
     # YOUR CODE HERE
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
     num_iterations = 30
-    learning_rate = 0.01
-    hidden_dim = 60
+    learning_rate = 0.015
     out_dim = len(ut.L2I)
+    train_data = ut.TRAIN
+    dev_data = ut.DEV
+    in_dim = len(ut.F2I)
 
-    if test_bigrams:
-        train_data = ut.TRAIN
-        dev_data = ut.DEV
-        in_dim = len(ut.F2I)
+    dims = [in_dim, 60, 12, out_dim]  # 60 12
 
-        params = m1.create_classifier(in_dim, hidden_dim, out_dim)
-        trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
-    else:
-        train_data, dev_data, F2I = ut.get_unigrams()
-        in_dim = len(F2I)
-
-        params = m1.create_classifier(in_dim, hidden_dim, out_dim)
-        trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params, F2I)
-
-    predictTest = True  # set wether the log-liniear should predict the test data and write it to the file
+    params = mn.create_classifier(dims)
+    trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
 
     if predictTest:
         I2L = {i: l for l, i in ut.L2I.iteritems()}
         print I2L
         test = open("test.pred", "w")
         for feature in ut.getTEST():
-            lang = m1.predict(feats_to_vec(feature, ut.F2I), trained_params)
+            lang = mn.predict(feats_to_vec(feature, ut.F2I), trained_params)
             test.write(I2L[lang] + '\n')
             print I2L[lang]
         test.close()
